@@ -1,0 +1,1 @@
+# id;idEmpleado;diaActual;iniActual;finActual;diaProp;iniProp;finProp;estado

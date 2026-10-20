@@ -1,0 +1,42 @@
+sequenceDiagram
+    autonumber
+    actor S as Socio
+    participant C as DemoAcademiasYReservas
+    participant CD as ClubDeportivo
+    participant I as i : Instalacion
+    participant SE as s : SesionEntrenamiento
+    participant T as inst : CanchaTenis
+    participant R as r : Reserva
+    S->>C: elige instalación, bloque, jugadores y modalidad
+    C->>CD: reservar(socio, "TEN-1", fechaHora, 2, "SENCILLOS")
+    CD->>CD: socio.puedeUsarInstalacionesYPartidos()
+    alt el solicitante es Administrador (false) o no es Socio
+        CD-->>C: ReglaNegocioException
+    end
+    CD->>CD: buscarInstalacion("TEN-1")
+    loop cada instalación de la misma disciplina
+        CD->>I: estaOcupada(fechaHora)
+        I-->>CD: boolean
+    end
+    alt ocupadas >= maxInstalacionesSimultaneas[TENIS]
+        CD-->>C: ReglaNegocioException (máximo simultáneo)
+    end
+    loop cada sesión de entrenamiento en esa instalación
+        CD->>SE: seCruzaCon(fechaHora, 60)
+        SE-->>CD: boolean
+    end
+    CD->>CD: proximoId("RESERVA")
+    CD->>T: reservar(id, socio, fechaHora, 2, "SENCILLOS")
+    T->>T: admiteJugadores(2, "SENCILLOS") (polimórfico)
+    T->>T: estaOcupada(fechaHora) → Reserva.seCruzaCon por cada reserva
+    T->>T: socio.tieneBebidaCaliente() && !permiteBebidaCaliente()
+    alt alguna regla falla
+        T-->>CD: ReglaNegocioException
+        CD-->>C: ReglaNegocioException (no se consume el id)
+    else todas las reglas se cumplen
+        T->>R: «create» Reserva(id, inst, socio, fechaHora, 2, "SENCILLOS")
+        T-->>CD: r
+        CD->>CD: siguienteId("RESERVA")
+        CD-->>C: r
+    end
+    C->>C: ConsolaBase.guardarResultado(club, "demo4_academias")

@@ -1,0 +1,24 @@
+digraph G {
+  rankdir=LR; graph [fontname="Helvetica", fontsize=11, nodesep=0.35, ranksep=0.9, pad=0.2];
+  node [fontname="Helvetica", fontsize=11]; edge [fontname="Helvetica", fontsize=9, color="#333333"];
+  subgraph cluster_actores { label="Usuarios (login y password)"; style="rounded,dashed"; color="#888888";
+    socio [shape=box, style="rounded,filled", fillcolor="#E8F0FB", label="Socio\n(jugador)"];
+    ent [shape=box, style="rounded,filled", fillcolor="#E8F0FB", label="Entrenador"];
+    fis [shape=box, style="rounded,filled", fillcolor="#E8F0FB", label="Fisioterapeuta"];
+    adm [shape=box, style="rounded,filled", fillcolor="#E8F0FB", label="Administrador"];
+  }
+  subgraph cluster_sis { label="Sistema Club Deportivo Séneca (proyecto Eclipse ClubDeportivoSeneca)"; style="rounded,filled"; fillcolor="#F7F7F7"; color="#777777";
+    cons [shape=box, style=filled, fillcolor=white, label="Consolas de demostración\n(paquete consola)"];
+    fach [shape=box, style=filled, fillcolor=white, label="Fachada ClubDeportivo\n(paquete logica)"];
+    dom [shape=box, style=filled, fillcolor=white, label="Dominio y reglas\n(paquetes modelo.*, excepciones)"];
+    per [shape=box, style=filled, fillcolor=white, label="PersistenciaClub\n(paquete persistencia)"];
+    cons -> fach [label="invoca operaciones"]; cons -> dom [label="opera objetos ya obtenidos\n(venta abierta, partido, sesión)", style=dashed];
+    fach -> dom [label="delega / valida reglas\nentre colecciones"]; fach -> per [label="guardar / cargar"];
+  }
+  datos [shape=folder, style=filled, fillcolor="#FFFDE7", label="datos/\n27 archivos .txt\n(fuera de src/)"];
+  res [shape=folder, style=filled, fillcolor="#FFFDE7", label="datos_resultado/<demo>/\nestado final de cada demo"];
+  socio -> cons; ent -> cons; fis -> cons; adm -> cons;
+  per -> datos [label="lee y escribe"]; per -> res [label="escribe"];
+  futuro [shape=note, style=filled, fillcolor="#FFFFFF", fontsize=9, label="Proyecto 2: interfaz de usuario\nreemplaza solo las consolas"];
+  futuro -> cons [style=dotted, arrowhead=none];
+}

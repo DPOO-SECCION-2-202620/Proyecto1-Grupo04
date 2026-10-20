@@ -1,0 +1,39 @@
+sequenceDiagram
+    autonumber
+    participant C as DemoCompetencias
+    participant CD as ClubDeportivo
+    participant P as pr : PartidoCompetencia
+    participant IC as ins : InscripcionCompetencia
+    participant EN as andres : Entrenador
+    participant EF as e : EstadisticaFutbol
+    participant L as cerros : CompetenciaLiga
+    C->>CD: programarPartidoCompetencia(comp, equipo, rival, escenario, fecha, fase, grupo)
+    CD-->>C: pr
+    C->>P: registrarEstadisticas(e)
+    P->>P: valida no jugado y e.getDeporte() == deporte
+    P->>IC: estaHabilitado(jugador) [vía jugadorPuedeParticipar]
+    Note over IC: en la nómina y no suspendido en la competencia
+    alt no habilitado o estadística repetida
+        P-->>C: ReglaNegocioException
+    else válido
+        P->>P: estadisticas.add(e)
+    end
+    C->>EN: registrarResultadoPartido(pr, 3, 0)
+    EN->>P: registrarResultado(3, 0)
+    P->>IC: tieneMinimoHabilitados() [vía puedeJugarse]
+    P->>P: deporte.permiteEmpate() si hay empate
+    alt ya jugado, sin mínimo, marcador negativo o empate no permitido
+        P-->>EN: ReglaNegocioException
+    else válido
+        P->>P: fija marcador, jugado = true
+        P->>IC: actualizarSanciones(estadisticas) [alFinalizar, polimórfico]
+        loop cada estadística de la nómina
+            IC->>EF: getAmarillas(), tieneRoja()
+            Note over IC: acumula amarillas y suspende con roja o al completar un ciclo de 2 amarillas
+        end
+    end
+    C->>L: calcularTablaPosiciones()
+    L->>L: calcularPuntos() → getEnfrentamientosJugados()
+    L->>P: comoEnfrentamiento()
+    L->>L: PosicionTabla.construirTabla(equipos, enfrentamientos, deporte, …)
+    L-->>C: List<PosicionTabla>

@@ -1,0 +1,39 @@
+sequenceDiagram
+    autonumber
+    participant C as DemoTiendaYCafeteria
+    participant CD as ClubDeportivo
+    participant V as v : VentaTienda
+    participant A as a : Articulo
+    participant CO as cod : CodigoDescuento
+    participant IT as it : ItemVentaTienda
+    participant U as comprador : Usuario
+    C->>CD: iniciarVentaTienda(comprador, fecha)
+    CD->>V: «create» VentaTienda(siguienteId("VENTA"), fecha, comprador)
+    CD-->>C: v
+    C->>CD: buscarArticulo("Balón Fútbol Golty")
+    CD-->>C: a
+    C->>V: agregarItem(a, 1)
+    V->>A: hayInventarioSuficiente(enCarrito + 1)
+    A-->>V: getCantidadEn("TIENDA") >= cantidad
+    alt no alcanza el inventario de la TIENDA
+        V-->>C: ReglaNegocioException
+    else hay inventario
+        V->>IT: «create» ItemVentaTienda(a, 1, a.getPrecio())
+    end
+    C->>CD: buscarCodigo("EMP-E002")
+    CD-->>C: cod
+    C->>V: aplicarDescuento(cod)
+    Note over V: rechaza un segundo código o si ya se redimieron puntos (no acumulable)
+    C->>CD: confirmarVenta(v)
+    CD->>V: cerrar() [Template Method en Venta]
+    V->>V: validarAntesDeCerrar() (gancho: ítems e inventario)
+    V->>V: calcularTotal()
+    V->>IT: calcularSubtotal()
+    V->>CO: calcularPorcentaje(comprador) (15 % dueño / 8 % otro)
+    Note over V: base = subtotal − descuento − puntosRedimidos<br/>impuesto = base × 0,19 · puntos = 2 % de (base + impuesto)
+    V->>V: alCerrar() (gancho)
+    V->>A: retirarInventario("TIENDA", 1)
+    V->>U: acumularPuntos(base + impuesto)
+    V-->>CD: venta cerrada
+    CD->>CD: ventas.add(v)
+    CD-->>C: ok

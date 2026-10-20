@@ -1,0 +1,6 @@
+bin/
+datos_resultado/
+.DS_Store
+*.zip
+*.mov
+*.mp4

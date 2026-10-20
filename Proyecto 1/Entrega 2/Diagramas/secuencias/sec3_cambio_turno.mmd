@@ -1,0 +1,42 @@
+sequenceDiagram
+    autonumber
+    participant C as DemoEntrenamientoYTurnos
+    participant CD as ClubDeportivo
+    participant AD as admin : Administrador
+    participant SO as s : SolicitudCambioTurno
+    participant E as solicitante : Empleado
+    participant O as e : Empleado (cada uno)
+    participant TU as t : Turno
+    C->>CD: solicitarCambioTurno(empleado, actual, propuesto)
+    CD->>SO: «create» SolicitudCambioTurno(siguienteId("SOLICITUD"), empleado, actual, propuesto)
+    CD-->>C: s (PENDIENTE)
+    C->>CD: aprobarCambioTurno(admin, s)
+    CD->>CD: getEmpleados()
+    CD->>AD: aprobarCambioTurno(s, empleados, diasAtencion, horaApertura, horaCierre)
+    AD->>SO: getEstado()
+    alt estado != PENDIENTE
+        AD-->>CD: ReglaNegocioException ("ya fue revisada")
+    end
+    AD->>E: getTurnos() y busca el turno con mismoHorario(actual)
+    alt el empleado no tiene ese turno
+        AD-->>CD: ReglaNegocioException
+    end
+    AD->>AD: turnosSimulados = turnos − actual + propuesto
+    loop cada día de atención y cada bloque de 15 min en [apertura, cierre)
+        loop cada empleado
+            alt e es el solicitante
+                AD->>TU: cubre(dia, t) sobre turnosSimulados
+            else otro empleado
+                AD->>O: estaDisponible(dia, t)
+                O->>TU: cubre(dia, t)
+            end
+        end
+        alt entrenadores < 2 o fisioterapeutas < 1
+            AD->>SO: rechazar()
+            AD-->>CD: false
+        end
+    end
+    AD->>E: reemplaza el turno actual por el propuesto
+    AD->>SO: aprobar()
+    AD-->>CD: true
+    CD-->>C: true / false

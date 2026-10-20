@@ -1,0 +1,32 @@
+digraph G {
+rankdir=TB;
+graph [fontname="Helvetica", fontsize=11, nodesep=0.8, ranksep=0.9, pad=0.2, newrank=true];
+node [fontname="Helvetica", fontsize=10, shape=plain];
+edge [fontname="Helvetica", fontsize=8.5, labelfontsize=8.5, labeldistance=1.6, labelangle=25, color="#333333"];
+
+"Consolas" [shape=box, style="rounded,filled", fillcolor="#FFFFFF", label=<<B>consola</B><BR/>MenuDemostraciones · ConsolaBase<BR/>GeneradorDatosPrueba · Demo* (8)>, fontsize=10];
+"ClubDeportivo" [shape=box, style="rounded,filled", fillcolor="#EEEEEE", label=<<B>logica</B><BR/>ClubDeportivo (fachada)>, fontsize=10];
+"PersistenciaClub" [shape=box, style="rounded,filled", fillcolor="#EEEEEE", label=<<B>persistencia</B><BR/>PersistenciaClub>, fontsize=10];
+"datos" [shape=folder, style=filled, fillcolor="#FFFDE7", label=<<B>datos/</B><BR/>27 archivos .txt>, fontsize=10];
+"exc" [shape=box, style="rounded,filled", fillcolor="#EEEEEE", label=<<B>excepciones</B><BR/>ReglaNegocioException>, fontsize=10];
+"usuarios" [shape=box, style="rounded,filled", fillcolor="#E8F0FB", label=<<B>Usuarios, turnos, entrenamiento y reportes</B><BR/><FONT POINT-SIZE="9">13 clases</FONT>>, fontsize=11, width=2.6];
+"conjunto" [shape=box, style="rounded,filled", fillcolor="#EAF6EC", label=<<B>Equipos, partidos y competencias</B><BR/><FONT POINT-SIZE="9">17 clases</FONT>>, fontsize=11, width=2.6];
+"academias" [shape=box, style="rounded,filled", fillcolor="#FFF4E0", label=<<B>Academias individuales e instalaciones</B><BR/><FONT POINT-SIZE="9">10 clases</FONT>>, fontsize=11, width=2.6];
+"ventas" [shape=box, style="rounded,filled", fillcolor="#F7EAF5", label=<<B>Tienda, cafetería y ventas</B><BR/><FONT POINT-SIZE="9">13 clases</FONT>>, fontsize=11, width=2.6];
+{rank=same; "conjunto"; "academias"; "ventas";}
+{rank=same; "usuarios"; "exc";}
+{rank=same; "ClubDeportivo"; "PersistenciaClub"; "datos";}
+"Consolas" -> "ClubDeportivo" [style=dashed, arrowhead=vee, label="invoca"];
+"ClubDeportivo" -> "PersistenciaClub" [style=dashed, arrowhead=vee, label="guardar / cargar"];
+"PersistenciaClub" -> "datos" [style=dashed, arrowhead=vee, label="lee / escribe"];
+"ClubDeportivo" -> "conjunto" [arrowhead=vee, label="colecciones 0..*"];
+"ClubDeportivo" -> "academias" [arrowhead=vee, label="colecciones 0..*"];
+"ClubDeportivo" -> "ventas" [arrowhead=vee, label="colecciones 0..*"];
+"ClubDeportivo" -> "usuarios" [arrowhead=vee, label="colecciones 0..*", constraint=false];
+"academias" -> "usuarios" [arrowhead=vee, color="#666666", label="3 rel.", fontsize=8, constraint=true];
+"conjunto" -> "usuarios" [arrowhead=vee, color="#666666", label="3 rel.", fontsize=8, constraint=true];
+"usuarios" -> "academias" [arrowhead=vee, color="#666666", label="4 rel.", fontsize=8, constraint=false];
+"usuarios" -> "conjunto" [arrowhead=vee, color="#666666", label="3 rel.", fontsize=8, constraint=false];
+"usuarios" -> "ventas" [arrowhead=vee, color="#666666", label="2 rel.", fontsize=8, constraint=false];
+"ventas" -> "usuarios" [arrowhead=vee, color="#666666", label="3 rel.", fontsize=8, constraint=true];
+}
